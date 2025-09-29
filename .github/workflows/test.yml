@@ -1,0 +1,82 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  check-index:
+    runs-on: ubuntu-latest
+    outputs:
+      index-exists: ${{ steps.check.outputs.exists }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Check if index.html exists
+        id: check
+        run: |
+          if [ -f "index.html" ]; then
+            echo "✅ Файл index.html найден"
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Файл index.html НЕ найден"
+            echo "exists=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+      
+      - name: Validate HTML content
+        if: steps.check.outputs.exists == 'true'
+        run: |
+          echo "🔍 Проверяем содержимое HTML..."
+          if grep -q "<button" index.html; then
+            echo "✅ Кнопка найдена в HTML"
+          else
+            echo "❌ Кнопка НЕ найдена в HTML"
+            exit 1
+          fi
+          
+          if grep -q "addEventListener" index.html; then
+            echo "✅ JavaScript код найден"
+          else
+            echo "❌ JavaScript код НЕ найден"
+            exit 1
+          fi
+          
+          echo "🎉 Все проверки пройдены успешно!"
+
+  deploy:
+    needs: check-index
+    runs-on: ubuntu-latest
+    if: needs.check-index.outputs.index-exists == 'true'
+    
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    
+    concurrency:
+      group: "pages"
+      cancel-in-progress: false
+    
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+      
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
