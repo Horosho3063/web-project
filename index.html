@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кнопка с изменяющимся цветом</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        
+        .container {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        #colorButton {
+            padding: 15px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background-color: #3498db;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        #colorButton:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        #colorButton:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Нажмите на кнопку!</h1>
+        <button id="colorButton">Изменить цвет</button>
+    </div>
+
+    <script>
+        const button = document.getElementById('colorButton');
+        const colors = [
+            '#3498db', // Синий
+            '#e74c3c', // Красный
+            '#2ecc71', // Зеленый
+            '#f39c12', // Оранжевый
+            '#9b59b6', // Фиолетовый
+            '#1abc9c', // Бирюзовый
+            '#e67e22', // Морковный
+            '#34495e'  // Темно-серый
+        ];
+        
+        let currentColorIndex = 0;
+        
+        button.addEventListener('click', function() {
+            currentColorIndex = (currentColorIndex + 1) % colors.length;
+            button.style.backgroundColor = colors[currentColorIndex];
+        });
+    </script>
+</body>
+</html>
